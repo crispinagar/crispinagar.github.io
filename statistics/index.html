@@ -49,7 +49,11 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#mean-standard-deviation-and-standard-error">Mean, Standard Deviation, and Standard Error</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#anova">ANOVA</a>
+    <li class="toctree-l2"><a class="reference internal" href="#variance-covariance-and-correlation">Variance, Covariance, and Correlation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pearsons-r-squared">Pearson's R-squared</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#one-way-anova-analysis-of-variances">One-way ANOVA (Analysis of Variances)</a>
     </li>
     </ul>
                 </li>
@@ -90,10 +94,38 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="statistics-recipes">Statistics Recipes</h1>
-<p>These are a series of "How-to" guides on various concepts and methods in statistics that I have found useful.</p>
+<p>These are a series of reference notes and "how-to" guides on various concepts, formulas, and methods in statistics that I have found useful.</p>
 <h2 id="mean-standard-deviation-and-standard-error">Mean, Standard Deviation, and Standard Error</h2>
-<p>Write some stuff here.</p>
-<h2 id="anova">ANOVA</h2>
+<p>The <strong>population</strong> mean and standard deviation refer to the <strong>underlying probability distribution</strong> and are given by <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(\sigma\)</span> respectively.</p>
+<p>If a set of measurements, <span class="arithmatex">\(x_i\)</span>, represents the <em>entire</em> population, then <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(\sigma\)</span> may be <em>calculated</em> as follows:</p>
+<div class="arithmatex">\[\begin{align}
+\mu &amp;= \frac{1}{N}\sum_i x_i, &amp; \sigma^2 &amp;= \frac{1}{N}\sum_i (x_i - \mu)^2.
+\end{align}\]</div>
+<p>Otherwise, the data are only a <em>sample</em> of the total population, and the mean and standard deviation of the population may be <em>estimated</em> as follows:</p>
+<div class="arithmatex">\[\begin{align}
+\bar{x} &amp;= \frac{1}{N}\sum_i x_i, &amp; s^2 &amp;= \frac{1}{N-1}\sum_i (x_i - \bar{x})^2.
+\end{align}\]</div>
+<p>Note the change in notation. These two parameters, <span class="arithmatex">\(\bar{x}\)</span> and <span class="arithmatex">\(s\)</span> are referred ti as the <strong>sample mean and standard deviation</strong>.</p>
+<h2 id="variance-covariance-and-correlation">Variance, Covariance, and Correlation</h2>
+<p><strong>Variance:</strong></p>
+<div class="arithmatex">\[\begin{align}
+\text{var}(x) &amp;= \frac{1}{N-1}\sum_i (x_i - \bar{x})^2\\
+&amp;= s^2
+\end{align}\]</div>
+<p><strong>Covariance:</strong><br />
+The covariance is defined between two parameters, <span class="arithmatex">\(x\)</span> and <span class="arithmatex">\(y\)</span>, of which we have <span class="arithmatex">\(N\)</span> paired measurements.</p>
+<div class="arithmatex">\[
+\text{cov}(x,y) = \frac{1}{N}\sum_i(x_i - \bar{x})(y_i - \bar{y})
+\]</div>
+<p><strong>Correlation coefficient</strong></p>
+<p>The correlation coefficient, <span class="arithmatex">\(r_{xy}\)</span>, is not to be confused with (Pearson's) <span class="arithmatex">\(R^2\)</span>.</p>
+<div class="arithmatex">\[\begin{align}
+r_{xy} &amp;= \frac{\text{cov}(x,y)}{s_x s_y}\\\\
+&amp;= \frac{\sum_i(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_i(x_i - \bar{x})^2}\sqrt{\sum_i(y_i - \bar{y})^2}}
+\end{align}\]</div>
+<p>Note that the factors of <span class="arithmatex">\(1/(N-1)\)</span> cancel from the top and bottom of the latter equation.</p>
+<h2 id="pearsons-r-squared">Pearson's R-squared</h2>
+<h2 id="one-way-anova-analysis-of-variances">One-way ANOVA (Analysis of Variances)</h2>
 <p>Write more stuff here.</p>
               
             </div>
@@ -133,6 +165,9 @@
     <script>var base_url = '..';</script>
     <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
+      <script src="../javascripts/mathjax.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
       <script src="../search/main.js" defer></script>
     <script defer>
         window.onload = function () {
