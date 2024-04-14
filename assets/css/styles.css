@@ -20,8 +20,10 @@ body {
 /* ================================================= */
 
 .home-main {
-  width: 700px;
+  width: 60%;
   margin: 100px auto;
+  min-width: 300px;
+  max-width: 700px;
 }
 
 .blog-main {
@@ -41,11 +43,14 @@ body {
 
 .profile-header h1 {
   text-align: center;
-  font-size: 4.5rem;
+  font-size: min(4.5em, max(5vw,1.9em));
   font-weight: 800;
   margin: 0 0 30px 0;
 }
 
+.profile-header {
+  width: 70%;
+}
 
 .profile-top {
   display: flex;
@@ -57,6 +62,7 @@ body {
   margin: 0 0 0 auto;
   padding-top: 20px;
   padding-left: 5px;
+  min-width: 100px;
 }
 
 .button {
