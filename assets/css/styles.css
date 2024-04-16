@@ -22,20 +22,22 @@ body {
 .home-main {
   width: 60%;
   margin: 100px auto;
-  min-width: 300px;
+  min-width: 350px;
   max-width: 700px;
 }
 
 .blog-main {
   width: 60%;
   max-width: 700px;
-  min-width: 500px;
+  min-width: 350px;
   margin: 10px auto;
 }
 
 .content-main {
-  width: 700px;
-  height: 100px;
+  width: 80%;
+  min-width: 350px;
+  max-width: 700px;
+  /* height: 100px; */
   margin: 100px auto;
 }
 /* ================================================= */
@@ -70,7 +72,7 @@ body {
   background-color: var(--base-color);
   border-radius: 50px;
   text-align: center;
-  width: 100px;
+  width: 80px;
   padding: 10px;
   margin: 0 15px;
   border: 2px solid var(--middle-color);
@@ -131,7 +133,7 @@ body {
 }
 
 .content-main h1 {
-  text-align: left;
+  text-align: center;
   font-size: 4em;
   font-weight: 700;
   margin-bottom: 20px;
@@ -182,6 +184,7 @@ a {
 .blog-teaser .read-more:hover{
   font-weight: 800;
   color: var(--middle-color);
+  text-decoration: underline;
 }
 
 .blog-teaser-text {
@@ -254,4 +257,12 @@ a {
 }
 .item img:hover {
   filter: drop-shadow(0 0 1.5rem var(--middle-color));
+}
+
+.inline-link {
+  text-decoration: underline;
+}
+
+.inline-link:hover {
+  font-weight: bold;
 }
