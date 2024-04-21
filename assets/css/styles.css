@@ -266,3 +266,14 @@ a {
 .inline-link:hover {
   font-weight: bold;
 }
+
+li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.blog-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
