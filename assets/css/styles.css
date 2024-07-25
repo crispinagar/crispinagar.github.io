@@ -273,7 +273,19 @@ li {
 }
 
 .blog-image {
+  display: block;
   max-width: 100%;
   height: auto;
   border-radius: 10px;
+  margin-left: auto;
+  margin-right: auto
+}
+
+p .blog-caption {
+  padding-top: 6pt;
+  text-align: center;
+  font-size: small; 
+  font-style: italic; 
+  width: 75%;
+  margin: auto; 
 }
