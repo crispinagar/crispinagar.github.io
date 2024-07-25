@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RVM Geometry</title>
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:100,200,300,400,500,600,700,800,900">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTG1X8QRXQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GTG1X8QRXQ');
+  </script>
+
+  <!-- Mathjax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    MathJax = {
+      tex: {
+        tags: 'ams'  // should be 'ams', 'none', or 'all'
+      }
+    };
+    </script>
+
+
+</head>
+
+<body>
+
+<header>
+  <a href="/index.html"><div class="button">Home</div></a>
+  <a href="/blog-home.html"><div class="blogs-home">Blog home</div></a>  
+</header>
+
+<div class="content-main" style="max-width:800px">
+  <h1>Geometry of the Rotating Vector Model</h1>
+  <p class="date-line">2024-06-17 — 10 min read</p>
+  <br>
+  <p><em>Note: because this page contains long equations, it is best viewed on desktop.</em></p>
+
+  <h2>The Rotating Vector Model</h2>
+
+  <p>This page is dedicated to the derivation of one of the models of the geometry of radio pulsars I relied upon during my PhD - I have been meaning to formally write down the derivation for some time, and have finally got round to doing so. First, a little background!</p>
+
+  <p>The radio emission from pulsars typically shows a large amount of linear polarisation, especially in younger stars. The angle of this polarisation, the "position angle" (PA) is seen to change as the star rotates. Because pulsars have <em>extremely</em> strong magnetic fields, the change in the PA is thought to be associated with the changing orientation of the magnetic field lines with respect to the observer's line of sight.</p>
+
+  <p>When plotted as a function of the star's rotation, or "pulse longitude", the position angle traces out a characteristic S-shaped curve. An example can be seen in the figure below, which shows the pulse profile and smooth PA curve of the Vela pulsar in the lower panel.</p>
+
+  <img class="blog-image" src="/assets/images/vela.png">
+  <p class="blog-caption">The highly polarised profile of the Vela pulsar at 1375 MHz. The upper panel shows the total intensity (black), linear polarisation (red) and circular polarisation (green). The lower panel shows the position angle of the linear polarisation as it varies smoothly across the pulse profile. Date from the <a class="inline-link" href="http://www.epta.eu.org/epndb/">European Pulsar Network Database.</a></p>
+
+  <p>Radhakrishnan & Cooke (1969) showed that the PA curve can be fit by a simple geometric model they termed the Rotating Vector Model (RVM), built upon the following assumptions:'
+  <ol>
+    <li>Each magnetic field line lies in a single plane containing the magnetic axis (for example a static dipolar field)</li>
+    <li>This plane defines the linear polarisation direction of any radiation emitted in its vicinity.</li>
+  </ol>
+
+  From the point of view of an observer looking down at the star the magnetic field lines would appear to be projected out from the magnetic axis, and as the line of sight (LOS) passes over this area the angle of the field lines changes smoothly by up to \(180^\circ \).
+  </p>
+
+  <img class="blog-image" src="/assets/images/pa_illustration.png" style="width: 80%;max-width: 450px;">
+  <p class="blog-caption">The magnetic field lines appear to extend radially from the magnetic axis (<em>B</em>) when viewed from above. As the line of sight passes over them, the position angle rotates according to the orientation of the field line.</p>
+
+  <p>Komesaroff (1970) showed that the change in position angle, \(\psi\), as a function of the pulse longitude, \(\phi\), can be described by
+  
+  $$
+  \tan(\psi-\psi_0) =  \frac{\sin(\phi-\phi_0)\sin\alpha}{\sin(\alpha + \beta)\cos\alpha - \cos(\alpha+\beta)\sin\alpha\cos(\phi-\phi_0)}
+  $$
+
+  which is a smooth S-shaped curve with an inflection point at \((\phi_0,\ \psi_0) \). The angle \(\alpha\) is the inclination angle between the stars magnetic and rotation axes, and \(\beta\) is the impact angle between the magnetic axis and the observer's line of sight as the pulsar rotates. 
+  </p>
+
+  <img class="blog-image" src="/assets/images/pulsar_geometry.png" style="width: 80%;max-width: 450px;">
+  <p class="blog-caption">The angle \(\alpha\) is the inclination of the magnetic axis <strong>B</strong> to the rotation axis \(\mathbf\Omega\). The angle \(\beta\) is that between the magentic axis and the observer's line of sight.</p>
+
+  <p>
+  Overall, we can draw the full geometry of the Rotating Vector Model by defining a triangle on the surface of a sphere between three points: the pulsar's rotation axis, the magnetic axis, and the footprint of the observer's line of sight.
+  </p>
+
+  <img class="blog-image" src="/assets/images/angles_geometry.png" style="width: 80%; max-width: 450px;">
+  <p class="blog-caption">A flattened view of the triangle on the surface of the star from which we derive the Rotating Vector Model equation above. R is the (angular) distance between the point on the line of sight and the magnetic axis at any given time. The minimum value of R is \(\beta\).</p>
+
+  <h2>Spherical geometry rules</h2>
+
+  <p>
+    In order to derive the RVM equation given by Komesaroff, we must make use of two trigonometric identies for spherical geometry. These are the spherical sine rule:
+    $$
+    \frac{\sin A}{\sin a} = \frac{\sin B}{\sin b} = \frac{\sin C}{\sin c}   
+    $$
+
+    ...and the spherical cosine rule:
+    $$
+    \cos a = \cos b \cos c + \sin b \sin c \cos A.
+    $$
+
+    These apply to a triangle drawn on the surface of a sphere as below, where each side is a great circle arc (the shortest path between two points on the surface of a sphere: a segment of a great circle, which is a circle on the sphere's surface whose center coincides with the center of the sphere).
+  </p>
+
+  <img class="blog-image" src="/assets/images/spherical_geometry.png" style="width: 50%;">
+  <p class="blog-caption">The angles defining a spherical triangle formed of three great circle arcs.</p>
+
+  <h2>Deriving the RVM</h2>
+  <p>
+    There are three equations we start with, which are simply the spherical sine and cosine rules applied to the triangle that defines the pular geometry:
+    \begin{equation}
+    \frac{\sin(\psi-\psi_0)}{\sin\alpha} = \frac{\sin(\phi-\phi_0)}{\sin R}
+    \end{equation}
+
+    \begin{equation}
+    \cos\alpha = \cos R \cos(\alpha+\beta)+\sin R \sin(\alpha+\beta)\cos(\psi - \psi_0)
+    \end{equation}
+
+    \begin{equation}\label{test}
+    \cos R = \cos(\alpha+\beta)\cos\alpha+\sin(\alpha+\beta)\sin\alpha\cos(\phi - \phi_0)
+    \end{equation}
+
+    First, we rearrange equations (1) and (2) to bring only the \(\psi\) terms to the left-hand side:
+
+    \begin{equation}
+    \sin(\psi-\psi_0)= \frac{\sin(\phi-\phi_0)\sin\alpha}{\sin R}
+    \end{equation}
+    <br>
+    \begin{equation}
+      \cos(\psi-\psi_0) = \frac{\cos\alpha - \cos R \cos(\alpha+\beta)}{\sin R \sin(\alpha+\beta)}
+    \end{equation}
+
+    Next, we divide (4) by (5) and cancel out the \(\sin R\) terms:
+
+    \begin{align}
+    \tan(\psi-\psi_0) &= \frac{\sin(\phi-\phi_0)\sin\alpha\sin(\alpha+\beta)\enclose{updiagonalstrike}{\sin R}}{\enclose{updiagonalstrike}{\sin R}\cos\alpha - \enclose{updiagonalstrike}{\sin R} \cos R \cos(\alpha + \beta)} \\[16pt]
+
+    &= \frac{\sin(\phi-\phi_0)\sin\alpha\sin(\alpha+\beta)}{\cos\alpha - \cos R \cos(\alpha + \beta)}
+    \end{align}
+
+    Substituting in Eq. (3) for \( \cos R \). Then, we can cancel the \(\sin(\alpha+\beta)\) terms to end up with the final RVM equation:
+
+    \begin{align}
+    \tan(\psi-\psi_0) &= \frac{\sin(\phi-\phi_0)\sin\alpha\sin(\alpha+\beta)}{\cos\alpha - \cos^2(\alpha + \beta)\cos\alpha - \sin(\alpha+\beta)\cos(\alpha+\beta)\sin\alpha\cos(\phi-\phi_0)} \\[16pt]
+    & =    \frac{\sin(\phi-\phi_0)\sin\alpha\sin(\alpha+\beta)}{(1 - \cos^2(\alpha + \beta))\cos\alpha - \sin(\alpha+\beta)\cos(\alpha+\beta)\sin\alpha\cos(\phi-\phi_0)} \\[16pt]
+    & =    \frac{\sin(\phi-\phi_0)\sin\alpha\enclose{updiagonalstrike}{\sin(\alpha+\beta)}}{\sin^\enclose{updiagonalstrike}{2}(\alpha + \beta)\cos\alpha - \enclose{updiagonalstrike}{\sin(\alpha+\beta)}\cos(\alpha+\beta)\sin\alpha\cos(\phi-\phi_0)} \\[16pt]
+    \tan(\psi-\psi_0) &=  \frac{\sin(\phi-\phi_0)\sin\alpha}{\sin(\alpha + \beta)\cos\alpha - \cos(\alpha+\beta)\sin\alpha\cos(\phi-\phi_0)}.
+    \end{align}
+
+  </p>
+
+  <p>
+  We have derived the equation behind the Rotating Vector Model using simple spherical geometry and trigonometric identies. I hope this was interesting, and that it proves a useful for future students and for the simply curious!
+  </p>
+
+  <h3>Further reading</h3>
+  <ul>
+    <li><a href="https://ui.adsabs.harvard.edu/abs/1969ApL.....3..225R">Radhakrishnan V., Cooke D. J., 1969, Astrophysics Letters, 3, 225</a></li>
+    <li><a href="https://ui.adsabs.harvard.edu/abs/1970Natur.225..612K">Komesaroff M. M., 1970, Nature, 225, 612</a></li>
+    <li> <a href="https://www.cambridge.org/core/books/pulsar-astronomy/768C0EE45FB7A2452A6D62B1C933247A"><em>Pulsar Astronomy</em> (Lyne and Graham-Smith, 4th ed.)</a></li>
+    <li><a href="https://pure.manchester.ac.uk/ws/portalfiles/portal/208486492/FULL_TEXT.PDF">Chapter 1.2 of my PhD thesis!</a></li>
+  </ul>
+
+
+  <a href="#top"><div class="button" style="margin: auto; width: 100px; display: block;" >Back to top</div></a>
+</div>
+
+
+</body>
+</html>
