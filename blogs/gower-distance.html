@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gower Distance</title>
+  <link rel="icon" type="image/x-icon" href="/assets/images/icons/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:100,200,300,400,500,600,700,800,900">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTG1X8QRXQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GTG1X8QRXQ');
+  </script>
+
+  <!-- Mathjax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    MathJax = {
+      tex: {
+        tags: 'ams'  // should be 'ams', 'none', or 'all'
+      }
+    };
+    </script>
+
+
+</head>
+
+<body>
+
+<header>
+  <a href="/index.html"><div class="button">Home</div></a>
+  <a href="/blog-home.html"><div class="blogs-home">Blog home</div></a>  
+</header>
+
+<div class="content-main" style="max-width:800px">
+  <h1>Gower's distance for mixed data types</h1>
+  <p class="date-line">2024-08-29 — 5 min read</p>
+  <br>
+
+  <p>The idea of a "distance measure" between data points is very useful in different machine learning or data science tasks where we want some notion of how similar (or dissimilar) pairs of observations are. This is required for jobs such as clustering or classification, can be used to detect anomalies, or in information retrieval tasks through similarity searches.</p>
+
+  <p>Suppose we have two observations \(X_1 = (x_1, y_1)\) and \(X_2 = (x_2, y_2)\): if the data in these vectors is numeric then we can use familiar geometric measures such as <a class="inline-link" href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a> or <a class="inline-link" href="https://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan distance</a> to quantify their similarity. However, what if the observations contained a mix of different data types - not just numeric, but categorical or binary features? How could we compare them then?</p>
+
+  <h2>Gower's score</h2>
+  <p>Gower's distance (Gower 1971) is a simple metric appropriate for such a situation. It combines a "score" \(s_{ijk}\) for each different feature \(k\) into a single measure of similarity between pairs of points \(i\) and \(j\).</p>
+
+  <p>Each feature is given a score according to its data type, as described by Gower:</p>
+
+  <h4>Numeric variables (continuous or discrete):</h4>
+
+  <p>
+  $$s_{ijk} = 1 - \frac{|x_{ik} - x_{jk}|}{R_k}$$
+  
+  where \(R_k\) is the range of the feature \(k\), either across the sample or the population (if known). This scoring can also be extended to ordinal features, e.g. ranks or scales (Podani 1999).</p>
+
+  <h4>Categorical or binary variables:</h4>
+  <p>
+  $$s_{ijk} =\left\{\begin{matrix}1 \text{ if }x_{ik} = x_{jk}\\0 \text{ if }x_{ik} \neq x_{jk}\end{matrix}\right.$$</p>
+
+  <h4>Dichotomous variables:</h4>
+  <p>These are features that are either true or false, but used in situations where only the presence of a feature ("true") is informative, whereas its absence is uninformative.</p>
+  <p>
+  $$s_{ijk} = \left\{\begin{matrix}1 \text{ if }x_{ik} = \text{ true AND }x_{jk} = \text{ true } \\0 \text{ otherwise.}\end{matrix}\right.$$</p>
+  <p>An example of a dichotomous variable might be "travels by car": if two people do not travel by car, that does not necessarily mean they are similar.</p>
+
+  <p>The total score is then just the average of all the scores for the available features:
+    
+  $$
+  S_{ij} = \frac{\sum_{k=1}^N{(s_{ijk}\cdot\delta_{ijk})}}{\sum_{k=1}^N{\delta_{ijk}}}.
+  $$
+
+  \(\delta_{ijk}\) is equal to 1 for all features that can be compared and 0 when they cannot, for example if one or both observations are missing that feature. The total score will be 1 for pairs of identical observations, and 0 for those which are as different as it is possible to be given the data.
+  </p>
+
+  <h2>From score to distance</h2>
+
+  <p>So far we have only referred to a total similarity score rather than a distance in the more familiar sense. If observations \(i\) and \(j\) have a total score \(S_{ij}\) then the "distance" between them is given by 
+
+  $$
+  D_{ij} = \sqrt{1-S_{ij}}.
+  $$
+  </p>
+
+  <p>For this to be a valid measure of distance it must satisfy the triangle equality - considering three data points, a, b, and c
+
+  $$
+  \sqrt{1-S_{ab}} + \sqrt{1-S_{bc}} \geq \sqrt{1-S_{ac}}.
+  $$
+
+  Gower (1971) shows that this holds true if there are no missing features (i.e. all the \(\delta_{ijk} = 1\)).
+  </p>
+
+  <h2>Example</h2>
+
+  <p>Finally, let's consider an example of calculating Gower's distance for data containing mixed-type features. The table below shows information about a number of individuals (identified by "Subject ID") with four attributes:
+  </p>
+  <ul>
+    <li>Age - a continuous numeric variable</li>
+    <li>Handedness - a binary variable, whether the individual is left- or right-handed.</li>
+    <li>Eye colour - a categorical variable</li>
+    <li>Knows Python - a dichotomous variable (while two people who know python may have a similar education, both of them <em>not</em> knowing Python does not imply they have similar backgrounds).</li>
+  </ul>
+
+  <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;margin: auto;}
+    .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+      overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+      font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg .tg-ycr8{background-color:#ffffff;text-align:left;vertical-align:top}
+    .tg .tg-u1yq{background-color:#c0c0c0;font-weight:bold;text-align:center;vertical-align:top}
+    </style>
+    <table class="tg"><thead>
+      <tr>
+        <th class="tg-u1yq"><span style="font-weight:700;font-style:normal;text-decoration:none;color:#000">Subject ID</span></th>
+        <th class="tg-u1yq"><span style="font-weight:700;font-style:normal;text-decoration:none;color:#000">Age</span></th>
+        <th class="tg-u1yq"><span style="font-weight:700;font-style:normal;text-decoration:none;color:#000">Handedness</span></th>
+        <th class="tg-u1yq"><span style="font-weight:700;font-style:normal;text-decoration:none;color:#000">Eye Colour</span></th>
+        <th class="tg-u1yq"><span style="font-weight:700;font-style:normal;text-decoration:none;color:#000">Knows Python</span></th>
+      </tr></thead>
+    <tbody>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">001</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">28</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Right</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Blue</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Yes</span></td>
+      </tr>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">002</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">34</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Left</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Blue</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">No</span></td>
+      </tr>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">003</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">22</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Right</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Green</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Yes</span></td>
+      </tr>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">004</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">45</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Right</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Hazel</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">No</span></td>
+      </tr>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">005</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">30</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Left</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Brown</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">Yes</span></td>
+      </tr>
+    </tbody></table>
+
+    <p>Let's look at individuals 001 and 002, and calculate the score for each feature in turn.</p>
+    <h4>Age:</h4>
+
+    <p>
+    $$s_{age} = 1 - \frac{|28 - 34|}{23} = 0.74$$
+    
+    Here the range \(R_k\) = 33 is the range of ages in the sample, which has a minimum of 22 and a maximum of 45.</p>
+    <h4>Handedness:</h4>
+    <p>Since the individuals have different handedness, \(s_{handedness} = 0\)</p>
+    <h4>Eye colour:</h4>
+    <p>They have the same eyes, \(s_{eyes} = 1\)</p>
+    <h4>Knows Python:</h4>
+    <p>Individual 001 knows python whereas 002 does not, so \(s_{python} = 0\)</p>
+    <p>We have no missing data, so all the \(\delta_{ijk} = 1\). The overall similarity score between 001 and 002 is therefore
+
+    \begin{align*}
+      S &= \frac{0.74\times1 + 0\times1 + 1\times1 + 0\times1}{1+1+1+1}\\
+      &= \frac{1.74}{4}\\
+      &= 0.435,
+    \end{align*}
+
+    so the Gower <em>distance</em> between these two people is
+    $$
+      D = \sqrt{1-0.435} = 0.75. 
+    $$
+    </p>
+    <p>Repeating the calculation for all pairs of individuals, we obtain the distance table below, which could then be used for clustering them into groups. We can see that the individuals who are most similar are 001 and 003 \((D = 0.56)\) and the most different are 004 and 005 \((D=0.96)\).</p>
+
+
+    <style type="text/css">
+      .tg  {border-collapse:collapse;border-spacing:0;}
+      .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg .tg-7uai{background-color:#efefef;color:#000000;font-weight:bold;text-align:left;vertical-align:bottom}
+      .tg .tg-96iu{background-color:#000000;color:#000000;text-align:left;vertical-align:bottom}
+      .tg .tg-kmlj{background-color:#c0c0c0;color:#000000;font-weight:bold;text-align:right;vertical-align:bottom}
+      .tg .tg-c7jj{background-color:#ffffff;color:#000000;text-align:right;vertical-align:bottom}
+      </style>
+      <table class="tg"><thead>
+        <tr>
+          <th class="tg-7uai"><span style="font-style:italic">Pairing</span></th>
+          <th class="tg-kmlj">001</th>
+          <th class="tg-kmlj">002</th>
+          <th class="tg-kmlj">003</th>
+          <th class="tg-kmlj">004</th>
+          <th class="tg-kmlj">005</th>
+        </tr></thead>
+      <tbody>
+        <tr>
+          <td class="tg-kmlj">001</td>
+          <td class="tg-96iu">-</td>
+          <td class="tg-c7jj">0.75</td>
+          <td class="tg-c7jj">0.56</td>
+          <td class="tg-c7jj">0.83</td>
+          <td class="tg-c7jj">0.72</td>
+        </tr>
+        <tr>
+          <td class="tg-kmlj">002</td>
+          <td class="tg-c7jj">0.75</td>
+          <td class="tg-96iu">-</td>
+          <td class="tg-c7jj">0.94</td>
+          <td class="tg-c7jj">0.93</td>
+          <td class="tg-c7jj">0.74</td>
+        </tr>
+        <tr>
+          <td class="tg-kmlj">003</td>
+          <td class="tg-c7jj">0.56</td>
+          <td class="tg-c7jj">0.94</td>
+          <td class="tg-96iu">-</td>
+          <td class="tg-c7jj">0.87</td>
+          <td class="tg-c7jj">0.77</td>
+        </tr>
+        <tr>
+          <td class="tg-kmlj">004</td>
+          <td class="tg-c7jj">0.83</td>
+          <td class="tg-c7jj">0.93</td>
+          <td class="tg-c7jj">0.87</td>
+          <td class="tg-96iu">-</td>
+          <td class="tg-c7jj">0.96</td>
+        </tr>
+        <tr>
+          <td class="tg-kmlj">005</td>
+          <td class="tg-c7jj">0.72</td>
+          <td class="tg-c7jj">0.74</td>
+          <td class="tg-c7jj">0.77</td>
+          <td class="tg-c7jj">0.96</td>
+          <td class="tg-96iu">-</td>
+        </tr>
+      </tbody></table>
+
+
+  <p>
+  In summary, Gower's distance is a simple and versatile tool for analysing datasets that contain mixed data types. It is particularly effective at handling combinations of numerical, categorical, and binary variables within a single measure. This makes it very useful in fields where datasets with mixed variable types are common, such as healthcare, marketing, and social sciences.
+  </p>
+
+
+  <h3>Further reading</h3>
+  <ul>
+    <li><a href="https://www.jstor.org/stable/2528823">A General Coefficient of Similarity and Some of Its Properties (Gower 1971)</a></li>
+    <li><a href="https://www.jstor.org/stable/1224438">Extending Gower's General Coefficient of Similarity to Ordinal Characters (Podani 1999)</a></li>
+    <li><a href="https://statisticaloddsandends.wordpress.com/2021/02/23/what-is-gowers-distance/">What is Gower's distance? (Statistical Odds & Ends)</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Gower%27s_distance">Gower's distance? (Wikipedia)</a></li>
+    
+  </ul>
+
+
+  <a href="#top"><div class="button" style="margin: auto; width: 100px; display: block;" >Back to top</div></a>
+</div>
+
+
+</body>
+</html>
