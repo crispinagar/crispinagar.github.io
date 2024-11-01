@@ -268,8 +268,8 @@ a {
 }
 
 li {
-  margin-top: 0.25em;
-  margin-bottom: 0.25em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .blog-image {
@@ -288,4 +288,10 @@ li {
   font-style: italic; 
   width: 75%;
   margin: auto; 
+}
+
+.code-snippet {
+  font-family: monospace;
+  background-color: #444444;
+  padding:5px;
 }

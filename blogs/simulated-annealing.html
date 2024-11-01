@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulated Annealing</title>
+  <link rel="icon" type="image/x-icon" href="/assets/images/icons/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:100,200,300,400,500,600,700,800,900">
+  
+  <!-- Google tag (gtag.js) -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTG1X8QRXQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GTG1X8QRXQ');
+  </script> -->
+
+  <!-- Mathjax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    MathJax = {
+      tex: {
+        tags: 'ams'  // should be 'ams', 'none', or 'all'
+      }
+    };
+    </script>
+
+
+</head>
+
+<body>
+
+<header>
+  <a href="/index.html"><div class="button">Home</div></a>
+  <a href="/blog-home.html"><div class="blogs-home">Blog home</div></a>  
+</header>
+
+<div class="content-main" style="max-width:800px">
+  <h1>Simulated annealing for global optimisation</h1>
+  <p class="date-line">2024-10-31 — 8 min read</p>
+  <br>
+
+  <p>Simulated annealing is a surprisingly simple yet very robust technique used to find the global optimum of a complicated objective function. It is inspired by the process of annealing in metallurgy, where a hot material is allowed to cool over a long period of time as a way of reducing its internal defects.</p>
+
+  <p>The algorithm is a stochastic process that explores potential solutions to an objective function, moving between states probabilistically depending on the relative improvement of a trial solution over the current solution. The fact it can sometimes move to a worse state allows it to escape local minima that could otherwise trap other gradient-based methods.</p>
+
+  <img class="blog-image" src="/assets/images/objective_function.png">
+  <div class="blog-caption">An example of a noisy function with lots of local minima. Normal gradient-based optimisation methods would fail to find the lowest point on the curve, but simulated annealing might succeed.</div>
+
+
+  <p>It works by slowly reducing the "temperature" of a system during which it tests out different neighbouring solutions to its current state. If a trial solution is better than the current one then the system jumps straight to that new state. If the trial solution is worse, then it can still jump to that state but only with some probability, \(P < 1\). The temperature influences this transition probability: higher temperatures mean the system is more likely to explore worse solutions.</p>
+
+  <p>Over time the temperature is reduced according to a "cooling schedule", making the system less likely to accept poor solutions. This means that eventually the system will settle down into the "best" (lowest cost) state.</p>
+
+  <h2>Components of simulated annealing</h2>
+
+  <p>The simulated annealing algorithm has several crucial components that work together to perform the optimisation. Each part mimics aspects of the physical annealing process in materials, where heat and gradual cooling allow particles to settle into a low-energy state. Here are the main features:</p>
+
+  <h3>Objective Function</h3>
+
+  <p>The objective function is the thing to be optimised. When simulated annealing is appropriate the objective function is usually a high-dimensional (has a lot of parameters), complicated (non-linear) function and can be quantified by a single measure. It may be discrete or combinatorial, for example <a class="inline-link" href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">the travelling salesman problem</a> or the layout of a factory to maximise efficiency.</p>
+
+  <h3>Neighbourhood structure</h3>
+
+  <p>There must be the ability for the system to explore neighbouring states of the objective function by making small adjustments to the parameters subject to any constraints upon them.</p>
+  
+  <h3>Cooling schedule</h3>
+
+  <p>The cooling schedule dictates how the temperature of the system is adjusted over time. The temperature starts high and decreases over successive iterations, slowly to avoid the system converging too quickly (to a suboptimal solution), but not too slow that the algorithm becomes inefficient. Commonly chosen cooling schedules include linear, exponential, or logarithmic decays, and adaptive cooling is sometimes used to adjust the schedule according to the behaviour of the objective function.</p>
+
+
+  <h3>Acceptance probability</h3>
+
+  <p>A key component of simulated annealing is the method to calculate the probability of moving to a neighbouring trial state \(S'\) when it presents a worse solution compared to the current state \(S\). In the case when the cost of the trial state is higher than the current state, \(C’ > C\), the transition probability is given by 
+   $$
+    P(S \leftarrow S’) = \exp\bigg(- \frac{C’-C}{T}\bigg)
+  $$
+  </p>
+
+  <img class="blog-image" src="/assets/images/neighbours.png">
+  <div class="blog-caption">In this scenario a step from state \(S\) to \(S'\) has a probability \(P=1\) or being accepted as the overall cost is reduced. However, a step to \(S''\) leads to increased cost \((C'' > C)\) so the transition occurs with some temperature-dependent probability \(P\lt1\).</div>
+
+  <h3>Stopping criterion</h3>
+  <p>The algorithm requires some criterion to determine when to terminate and return the solution. This could be when the temperature falls below some threshold, or after a set number of iterations. Another option is to detect the stabilisation of the system when there are no (or very little) improvements to the solution over many iterations.</p>
+
+  <h2>Psuedocode</h2>
+  <p>The basic simulated annealing process featuring all of the steps above is show below:</p>
+
+  <div class="code-snippet">
+    Initialise the system into some state \(S\) at starting temperature \(T\) with cost \(C\).<br><br>
+    WHILE the stopping criterion is not met:<br>
+    <div style="padding-left: 2em;">For \(N\) iterations each epoch:</div>
+    <div style="padding-left: 4em;">Explore a neighbouring state \(S'\) that has cost \(C'\)</div>
+    <div style="padding-left: 4em;">IF \(C' < C\) then jump to the new state:</div>
+    <div style="padding-left: 6em;">\(S \leftarrow S'\)<br>\(C \leftarrow C'\)</div>
+    <div style="padding-left: 4em;">ELSE jump to the new state with probability \(P = \exp(-(C'-C)/T)\):</div>
+    <div style="padding-left: 6em;">\(S \leftarrow S'\)<br>\(C \leftarrow C'\)</div>
+    <div style="padding-left: 2em;">Reduce the temperature according to the cooling schedule:</div>
+    <div style="padding-left: 4em;">\(T \leftarrow T'\)</div>
+  </div>
+
+  <h2>Where is simulated annealing applicable?</h2>
+  <ul>
+    <li>When global optimisation is required;</li>
+    <li>When the landscape of the objective function is complicated and noisy with many local minima;</li>
+    <li>When the objective function has a lot of parameters and/or is non-differentiable;</li>
+    <li>When the objective function is discrete or combinatorial (e.g. the travelling salesman problem, choosing the optimal path through an environment, choosing the optimum layout for structures).</li>
+  </ul>
+
+  <h2>Where is it NOT suitable?</h2>
+  <ul>
+    <li>When real-time performance is important (simulated annealing is a slow process that may require tuning and multiple restarts);</li>
+    <li>When exact solutions are required. The stochastic nature of the algorithm means it may not converge to the exact same solution on multiple runs;</li>
+    <li>When the objective functions is smooth meaning faster, gradient-based optimisation methods are available.</li>
+  </ul>
+
+  <h2>Advantages and disadvantages</h2>
+  <p>Simulated annealing has both advantages and disadvantages over "traditional" optimisation methods:</p>
+  <h3>Advantages</h3>
+  <ul>
+    <li>It has the ability to escape local minima;</li>
+    <li>It has the potential to find the <strong>global</strong> optimum;</li>
+    <li>It is very flexible, and can handle a wide range of objective functions no matter the complexity. Constraints on parameters are handled implicitly when neighbouring states are explored;</li>
+    <li>It is very simple and intuitive to implement.</li>
+  </ul>
+  <h3>Disadvantages</h3>
+  <ul>
+    <li>It is computationally intense, can be quite slow, and require a large number of iterations to converge;</li>
+    <li>It is not suitable for situations with an expensive objective function (e.g. one that takes a long time to resolve);</li>
+    <li>It is somewhat sensitive to the hyperparameters, especially the cooling schedule. Too fast and the algorithm will converge too quickly; too slow and time and calculations are wasted;</li>
+    <li>While the global optimum is attainable there is no guarantee that it will be reached - the cooling schedule especially requires tuning through experimentation;</li>
+    <li>It is stochastic in nature so not guaranteed to be reproducible. It may require multiple runs for a robust, ensemble solution when the algorithm converges to slightly different states.</li>
+  </ul>
+
+  <h3>Further reading</h3>
+  <ul>
+    <li><a href="https://en.wikipedia.org/wiki/Simulated_annealing">Simulated Annealing (Wikipedia)</a></li>
+    <li><a href="https://www.geeksforgeeks.org/what-is-simulated-annealing/">What is Simulated Annealing (Geeksforgeeks)</a></li>
+    <li><a href="https://towardsdatascience.com/an-introduction-to-a-powerful-optimization-technique-simulated-annealing-87fd1e3676dd">An Introduction to a Powerful Optimization Technique: Simulated Annealing (Towards Data Science)</a></li>
+    <li><a href="https://enac.hal.science/hal-01887543/document">Simulated annealing: From basics to applications (HAL open science)</a></li>
+    
+  </ul>
+
+
+  <a href="#top"><div class="button" style="margin: auto; width: 100px; display: block;" >Back to top</div></a>
+</div>
+
+
+</body>
+</html>
