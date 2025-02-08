@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiple Linear Regression</title>
+  <link rel="icon" type="image/x-icon" href="/assets/images/icons/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:100,200,300,400,500,600,700,800,900">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTG1X8QRXQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GTG1X8QRXQ');
+  </script>
+
+  <!-- Mathjax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    MathJax = {
+      tex: {
+        tags: 'ams'  // should be 'ams', 'none', or 'all'
+      }
+    };
+    </script>
+
+
+</head>
+
+<body>
+
+<header>
+  <a href="/index.html"><div class="button">Home</div></a>
+  <a href="/blog-home.html"><div class="blogs-home">Blog home</div></a>  
+</header>
+
+<div class="content-main" style="max-width:800px">
+  <h1>Multiple Linear Regression: A Practical Reference</h1>
+  <p class="date-line">2025-02-08 — 5 min read</p>
+  <br>
+
+  <p>This page is intended to provide a quick reference guide for different aspects of multiple regression, including model fitting, the covariance matrix and standard errors on coefficients, and confidence and prediction intervals on new observations.</p>
+
+  <p>Multiple linear regression is the extension of <a class="inline-link" href="https://en.wikipedia.org/wiki/Simple_linear_regression">simple linear regression</a> to data involving two or more predictor variables. It fits models of the form
+  
+  $$
+    y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \beta_3 x_{i3} + ... + \beta_m x_{i m} + \varepsilon_i,
+  $$
+
+  or in vector form
+
+  $$
+  \mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}.
+  $$
+
+  Writing this out explicitly, the vector form is the following: 
+
+  $$
+    \left[\begin{matrix}y_1\\y_2\\y_3\\...\\y_n \end{matrix}\right]
+    =
+    \left[\begin{matrix}
+    1 & x_{11} & x_{12} & ... & x_{1m}\\
+    1 & x_{21} & x_{22} & ... & x_{2m}\\
+    1 & x_{31} & x_{32} & ... & x_{3m}\\
+    ... & ... & ... & ... & ...\\
+    1 & x_{n1} & x_{n2} & ... & x_{nm}
+    \end{matrix}\right]
+    \left[\begin{matrix}\beta_1\\\beta_2\\\beta_3\\...\\\beta_m \end{matrix}\right] +
+    \left[\begin{matrix}\varepsilon_1\\\varepsilon_2\\\varepsilon_3\\...\\\varepsilon_m \end{matrix}\right].
+  $$
+  </p>
+
+  <p>The model is linear in the coefficients, \(\beta_i\) &mdash; hence the name. Errors are assumed to idependent and identally distributed (IID) Gaussian random variables.</p>
+
+  <br>
+
+  <p>The coefficients may be estimated by using least-squares regression, found by solving
+
+  $$
+  \mathbf{\hat\beta} = (\mathbf{X}^T\mathbf{X})^{-1} \mathbf{X}\mathbf{y}.
+  $$
+  </p>
+
+
+  <p>Here and throughout a variable with a hat ^ means it is <em>estimated</em>. The standard errors on the estimated coefficients, \(\mathbf{\hat\beta}\), are given by
+
+  $$
+  \text{se}(\hat\beta_i) = \sqrt{\hat\sigma^2(\mathbf{X}^T\mathbf{X})^{-1}_{ii}} 
+  $$
+
+  (where \(ii\) indicates the diagonal terms), where
+  $$
+  \hat\sigma^2 = \frac{\mathbf{\hat\varepsilon}^T\mathbf{\hat\varepsilon}}{n-p-1}
+  $$
+  is the fitted model variance, and 
+  $$
+  \mathbf{\hat\varepsilon} = \mathbf{y} - \mathbf{X}\mathbf{\hat\beta}
+  $$
+  are the residuals after fitting the model.
+  </p>
+
+  <p>
+  \(n\) is the total number of observations used in fitting the model, and \(p\) is the number of predictor variables. The extra \(-1\) in the denominator of \(\hat\sigma^2\) accounts for the intercept term, \(\beta_0\). </p>
+  
+  <p>\(\hat\sigma^2\) is the <em>unbiased</em> estimator of \(\sigma^2\), with \(-p-1\) being the correction.</p>
+
+  <p>
+  The matrix \(\hat\sigma^2(\mathbf{X}^T\mathbf{X})^{-1}\) is the covariance matrix, which tells us the relationship between pairs of variables.
+  </p>
+
+  <p>The estimated coefficients \(\hat\beta_i\) are considered significant if they are <em>not</em> consistent with \(0\). A p-value can be calculated for each parameter using a t-test with \(n-p-1\) degrees of freedom:
+  
+  $$
+  \text{t-value} = \frac{\hat\beta_i}{\text{se}(\hat\beta_i)};\ \ \ \ \ \text{d.o.f}=n-p-1
+  $$
+
+  If the sample size is large (typically \(n\gtrsim 30\)), a z-test can be used instead, almost identically:
+
+  $$
+  \text{z-score} = \frac{\hat\beta_i}{\text{se}(\hat\beta_i)}
+  $$
+  The z-test does not require a degrees-of-freedom parameter.
+  </p>
+
+  <br><br>
+
+  <h2>Confidence interval an prediction interval for a new observation</h2>
+
+  <p>Assume you have fitted a model to a some data and then you make a <strong>new</strong> observation, \(\mathbf{x_0}\). The confidence interval is the expected range of the <em>mean</em> response of the model, whereas the prediction interval is the expected range of the response for any <em>single</em> new observation. Subtly different!</p>
+
+  <ul>
+    <li>Confidence interval: \( \mathbb{E}(\hat{y}|\mathbf{x_0})\)</li>
+    <li>Prediction interval: \( \hat{y}|\mathbf{x_0}\)</li>    
+  </ul>
+
+  <p>
+  Both the confidence interval and the prediction interval are given by the value predicted by the model, \(\hat{y}\), plus the standard error on the estimate:
+  
+  $$
+    \text{se}( \mathbb{E}(\hat{y}|\mathbf{x_0}) ) = \sqrt{\hat\sigma^2\cdot \mathbf{x_0}^T(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{x_0}}
+  $$
+
+  $$
+    \text{se}(\hat{y}|\mathbf{x_0}) =\sqrt{\hat\sigma^2\cdot [1+\mathbf{x_0}^T(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{x_0}]}
+  $$
+  </p>
+
+  <p>The additional \(1+\) term in the latter accounts for the variation due to the error on the new observation &mdash; if we were looking at the <em>expected</em> value (mean), this error goes to zero because the expected value of random noise is zero.</p>
+
+  <p>Overall, the confidence interval (CI) and prediction interval (PI) are therefore given by
+  
+  $$
+    \text{CI:}\ \ \ \ \hat{y} \pm t_{(\alpha/2,\ n-p-1)}\cdot\text{se}( \mathbb{E}(\hat{y}|\mathbf{x_0}) )
+  $$
+
+  $$
+    \text{PI:}\ \ \ \ \hat{y} \pm t_{(\alpha/2,\ n-p-1)}\cdot\text{se}( \hat{y}|\mathbf{x_0} )
+  $$
+  </p>
+  <p>
+  \( t_{(\alpha/2,\ n-p-1)} \) is the t-value corresponding to the \(100(1-\alpha)\)% confidence interval for a t-distribtuion with \(n-p-1\) degrees of freedom. Again, for large \(n\), a z-value can be used instead (note: in both cases this is the value for a two-tailed distribution).
+  </p>
+  <p>
+
+  Typical confidence intervals, z-values, and associated p-values:
+
+  <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;margin: auto;}
+    .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+      overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+      font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg .tg-ycr8{background-color:#ffffff;text-align:left;vertical-align:top}
+    .tg .tg-u1yq{background-color:#c0c0c0;font-weight:bold;text-align:center;vertical-align:top}
+    </style>
+    <table class="tg"><thead>
+      <tr>
+        <th class="tg-u1yq"><span style="font-weight:700;font-style:normal;text-decoration:none;color:#000">Confidence</span></th>
+        <th class="tg-u1yq"><span style="font-weight:700;font-style:normal;text-decoration:none;color:#000">z-value</span></th>
+        <th class="tg-u1yq"><span style="font-weight:700;font-style:normal;text-decoration:none;color:#000">p-value</span></th>
+      </tr></thead>
+    <tbody>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">90%</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">1.644854</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">0.1</span></td>
+      </tr>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">95%</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">1.959964</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">0.05</span></td>
+      </tr>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">99%</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">2.575829</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">0.01</span></td>
+      </tr>
+      <tr>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">99.9%</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">3.290527</span></td>
+        <td class="tg-ycr8"><span style="font-weight:400;font-style:normal;text-decoration:none;color:#000">0.001</span></td>
+      </tr>
+    </tbody></table>
+    <br>
+    Since t-values are dependent on the degrees-of-freedom, they are typically looked up in a table &mdash; there are many such tables available online. 
+    </p>
+
+  <a href="#top"><div class="button" style="margin: auto; width: 100px; display: block;" >Back to top</div></a>
+</div>
+
+
+</body>
+</html>
