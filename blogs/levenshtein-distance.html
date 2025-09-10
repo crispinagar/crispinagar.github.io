@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Levenshtein Distance</title>
+  <meta name="description" content="An introduction to the Levenshtein distance, a metric for quantifying the similarity between two strings. I include a practical example as well as a Python implementation.">
+  <link rel="icon" type="image/x-icon" href="/assets/images/icons/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:100,200,300,400,500,600,700,800,900">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTG1X8QRXQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GTG1X8QRXQ');
+  </script>
+
+  <!-- Mathjax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    MathJax = {
+      tex: {
+        tags: 'ams'  // should be 'ams', 'none', or 'all'
+      }
+    };
+  </script>
+  <!-- Prism (syntax highlighting in code blocks) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/prism-python.min.js"></script>
+
+
+  
+
+</head>
+
+<body>
+
+<header>
+  <a href="/index.html"><div class="button">Home</div></a>
+  <a href="/blog-home.html"><div class="blogs-home">Blog home</div></a>  
+</header>
+
+<div class="content-main" style="max-width:800px">
+  <h1>Levenshtein distance: the similarity of two strings</h1>
+  <p class="date-line">2025-09-07 — 8 min read</p>
+  <br>
+
+  <h2>Overview</h2>
+  <p>The Levenshtein distance, one of several variations of “edit distance”, is a metric for measuring the similarity between two sequences or strings, defined by Soviet mathematician Vladimir Levenshtein in 1965.</p>
+
+  <p>Given two strings, e.g. “hello” and “world”, calculating the Levenshtein distance tells us the minimum number of single-character edits required to convert one string into the other. Three types of operation are permitted:</p>
+
+  <ol>
+    <li>Deletion of a character,</li>
+    <li>Insertion of a new character,</li>
+    <li>Substitution of one character for another.</li>
+  </ol>
+
+  <p>In the “hello/world” example we can see that both strings are five characters long, and there is one common character, the “l” at position four. The Levenstein distance between these two words is therefore four, since we need to swap the remaining letters.</p>
+
+  <p>Levenshtein distance is commutative (it does not matter in what order the strings are specified), and has clear upper and lower limits. If the strings are different lengths, then we will always need to either add or remove some characters, so this defines the minimum distance. If there are no common characters between the two strings, then all will need to be changed &mdash; the maximum distance is therefore the length of the longer string.</p>
+
+  $$
+  |\text{len}(\text{A}) - \text{len}(\text{A})| \leq \text{Levenshtein distance} \leq \text{max}(\text{len}(\text{A}),\text{len}(\text{B}))
+  $$
+
+  <p>This distance measure has many applications from computer science to biology. For example, it finds use in automatic spell-checking when Microsoft Word suggests corrections; approximate string matching can be used in finding and ranking similar results to user input to a search engine; and it appears in computational biology in the comparison of DNA sequences.</p>
+
+  <h2>Algorithm and example</h2>
+
+  <p>A simple implementation to calculate the Levenshtein distance using dynamic programming techniques is the Wagner-Fischer algorithm. This uses a matrix to hold the cumulative distance as we traverse the two strings character by character.</p>
+
+  <p>Consider again the example “hello/world”. The algorithm is as follows:</p>
+
+  <ol>
+    <li>Begin by initialising a matrix with n+1 rows and m+1 columns, where n is the length of string A and m is the length of string 2. Here, each string has 5 characters and we have added an extra “empty string” character (shown above and to the left for clarity; he order of the words does not matter as the result will be the same).</li>
+    <img class="blog-image" src="/assets/images/levenshtein_1.png" alt="alt text" style="width:75%; max-width:400px">
+    <li>Fill the first row and first column of the matrix with numbers 0-5. This represents how many characters must be inserted into the empty string in order to produce the substring at that point (“”=0, “h”=1, “he”=2, “hel”=3 and so on, and similar for “world”).</li>
+    <img class="blog-image" src="/assets/images/levenshtein_2.png" alt="alt text" style="width:75%; max-width:400px">
+    <li>Beginning from the first empty cell on the top left, proceed from left to right and top to bottom.
+      <ol>
+      <li>For each cell, compare the character for this row and column. If the characters are the same, record a cost of 0. If they are different, record a cost of 1.</li>
+      <li>Record the minimum value out of the three cells immediately left, above, and above left of the current cell.</li>
+      <li>Fill in the current cell with this minimum value plus the cost (0 or 1), and proceed to the next cell.</li>
+    </ol>
+    </li>
+      <img class="blog-image" src="/assets/images/levenshtein_3.png" alt="alt text" style="width:75%; max-width:500px">
+    <li>Once all cells in the matrix have been filled in, the bottom right cell corresponds to the Levenshtein distance between the two strings.</li>
+      <img class="blog-image" src="/assets/images/levenshtein_4.png" alt="alt text" style="width:75%; max-width:500px">
+  </ol>
+
+  <h2>Python script</h2>
+
+  The following python code is an implementation of the Wagner-Fischer algorithm, and will return the Levenshtein distance between two input strings.
+
+  <pre><code class="language-python" style="font-size: small">
+  import numpy as np
+
+  def levenshtein(string1, string2):
+    rows = len(string1)+1
+    cols = len(string2)+1
+    matrix = np.zeros((rows, cols))
+    matrix[...,0] = np.arange(rows)
+    matrix[0,...] = np.arange(cols)
+    for i in range(1,rows):
+      for j in range(1,cols):
+        if string1[i-1] == string2[j-1]:
+          cost = 0
+        else:
+          cost = 1
+        min_dist = min(matrix[i-1,j-1], matrix[i-1,j], matrix[i,j-1])
+        matrix[i,j] = min_dist+cost
+    return matrix[-1,-1].astype(int)
+
+  print(levenshtein("hello", "world"))
+  >> 4
+  </code></pre>
+
+  <h3>Further reading</h3>
+  <ul>
+    <li><a href="https://www.mathnet.ru/php/archive.phtml?wshow=paper&jrnid=dan&paperid=31411&option_lang=en">Binary codes with correction of deletions, insertions and substitutions of symbols (Levenshtein 1965) [Russian language]</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance (Wikipedia)</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Edit_distance">Edit distance (Wikipedia)</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm">Wagner-Fischer algorithm (Wikipedia)</a></li>
+    <li><a href="https://medium.com/@ethannam/understanding-the-levenshtein-distance-equation-for-beginners-c4285a5604f0">Understanding the Levenshtein Distance Equation for Beginners (Medium)</a></li>
+  </ul>
+
+
+  <a href="#top"><div class="button" style="margin: auto; width: 100px; display: block;" >Back to top</div></a>
+</div>
+
+
+</body>
+</html>
