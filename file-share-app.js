@@ -18,6 +18,18 @@
 const CHUNK_SIZE = 16 * 1024;             // 16 KB per chunk
 const BUFFER_LIMIT = 8 * 1024 * 1024;     // pause sending above ~8 MB queued
 
+// ICE servers passed straight to the underlying RTCPeerConnection. We override
+// PeerJS's defaults because their bundled STUN/TURN hostnames can fail DNS
+// lookup (ICE error 701), leaving Chrome with only local candidates and no way
+// to connect across networks. Google's public STUN resolves reliably and lets
+// each browser discover its public (server-reflexive) address.
+// NOTE: STUN alone still can't traverse symmetric NATs — that needs a TURN
+// relay, which is intentionally not configured here.
+const ICE_SERVERS = [
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" }
+];
+
 // connection-monitor tuning
 const CONNECT_TIMEOUT = 15000;            // give up dialing a peer after 15 s
 const HEARTBEAT_INTERVAL = 3000;          // send a ping every 3 s
@@ -68,7 +80,7 @@ const setStatus = (msg) => { $("status").textContent = msg; };
 // ---------- start PeerJS ----------
 function startPeer() {
   myName = generateName();
-  peer = new Peer(myName);
+  peer = new Peer(myName, { config: { iceServers: ICE_SERVERS } });
 
   peer.on("open", (id) => {
     brokerAttempts = 0;            // healthy registration resets the counter
