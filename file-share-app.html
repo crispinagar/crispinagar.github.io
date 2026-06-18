@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Share (WebRTC + PeerJS)</title>
+</head>
+<body>
+  <h1>File Share</h1>
+  <p>
+    Browser-to-browser file transfer over WebRTC. Connecting is handled by the
+    PeerJS broker, which only matches names and passes the handshake — your files
+    travel directly peer-to-peer and never touch the broker.
+  </p>
+
+  <h2>Your name</h2>
+  <p><strong id="myName">connecting…</strong></p>
+  <p>Share this name with someone, or enter their name below.</p>
+
+  <hr>
+
+  <h2>Connect</h2>
+  <label for="peerName">Enter the other person's name:</label>
+  <br>
+  <input type="text" id="peerName" size="30" placeholder="e.g. blue-walrus-42">
+  <button id="btnConnect" disabled>Connect</button>
+
+  <hr>
+
+  <h2>Status</h2>
+  <p id="status">Starting…</p>
+
+  <hr>
+
+  <section id="transferSection" hidden>
+    <h2>Send a file</h2>
+    <input type="file" id="fileInput">
+    <button id="btnSend" disabled>Send file</button>
+    <p id="sendProgress"></p>
+
+    <h2>Received files</h2>
+    <ul id="received"></ul>
+  </section>
+
+  <!-- PeerJS client library (loaded from CDN) -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="file-share-app.js"></script>
+</body>
+</html>
