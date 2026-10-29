@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple IRLS</title>
+  <meta name="description" content="A description and demonstration of a simple version of iteratively re-weighted least-squares fitting for robust regression.">
+  <link rel="icon" type="image/x-icon" href="/assets/images/icons/favicon.png">
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:100,200,300,400,500,600,700,800,900">
+  
+  <!-- Google tag (gtag.js) -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTG1X8QRXQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GTG1X8QRXQ');
+  </script> -->
+
+  <!-- Mathjax -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script>
+    MathJax = {
+      tex: {
+        tags: 'ams'  // should be 'ams', 'none', or 'all'
+      }
+    };
+    </script>
+
+  <!-- Prism (syntax highlighting in code blocks) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/prism-python.min.js"></script>
+
+
+</head>
+
+<body>
+
+<header>
+  <a href="/index.html"><div class="button">Home</div></a>
+  <a href="/blog-home.html"><div class="blogs-home">Blog home</div></a> 
+  <a href="/contact.html"><div class="button" style="float: right; background-color: #0A66C2;">Contact</div></a> 
+
+</header>
+
+<div class="content-main" style="max-width:800px">
+  <h1>Simple iteratively reweighted least-squares fitting</h1>
+  <p class="date-line">2026-04-19 — 5 min read</p>
+  <br>
+
+  <p>STUFF GOES HERE</p>
+
+  <img class="blog-image" src="/assets/images/irls_demo_1.png" alt="Scatter plot of X vs. Y with blue data points following an upward trend and one high outlier in orange. A red “naive” linear fit is pulled upward by the outlier, while a green IRLS fit line follows the main cluster more closely, showing reduced sensitivity to the outlier.">
+
+  <div class="blog-caption">A simple data set that follows a simple linear trend. There is a single outlier (orange) that biases a fitted model (red). Fitting the data using an IRLS approach mitigates the effect of the outlier, and the resulting model (green) follows the "real" data much more closely.</div>
+
+  <p>The method of performing a simple iteratively reweighted least-squares fit is as follows:</p>
+
+  <!-- Method of performing a regression in such a way that it mitigates the effects of outliers
+Iterative method – use the residuals from the current fit to update weights for the next iteration
+Method:
+Start with a simple model fit with no additional weights – trial model
+While not converged:
+Calculate residuals using the current fitted model
+Calculate weights = 1/ MAX(abs(residuals), delta)
+Fit a new model, this time including the weights
+If the parameters of the new model are sufficiently close to those of the previous iteration, we have reached convergence → stop and return model parameters
+Else set the trial model = current model -->
+
+  <ol>
+    <li>Begin by performing a simple least-squares fit to all data points, \(y_i\). The result of this initial step corresponds to the red "naive" fit show in the figures on this page. This fit forms the <strong>trial model.</strong></li>
+    <li>Calculate the residuals, \(e_i\), of the trial model:</li>
+    $$
+    e_i = y_i - \hat{y}_i,
+    $$
+    <li>Use the residuals to create weights \(w_i\) for the next iteration of the fit. I favour the weight formula</li>
+    $$
+    w_i = \frac{1}{\text{max}(|e_i|, \delta) }.
+    $$
+    which I find to be sufficiently robust for many applications. This formulation of the weights means that the regression tends to the least absolute error (LAE) or L1 regression. The \(\delta\) term is a small correction which prevents a divide-by-zero error in the rare case where a residual is exactly zero.
+
+  </ol>
+
+
+  <img class="blog-image" src="/assets/images/irls_demo_2.png" alt="Scatter plot of X vs. Y with blue data points forming an upward-curving trend and multiple orange outliers scattered widely. A red naive fit line is pulled off the main pattern by the outliers, while a green IRLS fit curve follows the central data more closely, showing robustness to outliers.">
+
+  <div class="blog-caption">A slightly more complex data set consisting of 100 data points, including 20 outliers (orange). A naive least-squares fit to the data set is affected by the outliers, whereas the IRLS fit better captures the shape of the central data &mdash; a nice tight parabola!</div>
+
+  
+  <p>The full Python code to perform the IRLS fits above is shown below:</p>
+  <pre><code class="language-python" style="font-size: small">import numpy as np
+
+def weighted_fit(predictors, response, weights=None):
+  # Simple function to perform a weighted fit
+  # Takes a tuple of predictors and a response
+  # Returns the fitted parameters
+
+  p = len(predictors) # number of predictors
+  n = len(response) # number of observations
+  X = np.ones((n, p+1))
+  for i in range(p):
+    X[:,i+1] = predictors[i]
+  if weights is not None:
+    W = np.diag(weights)
+  else:
+    W = np.diag(np.ones(n))
+  XtW = X.T @ W
+  try:
+    beta = np.linalg.inv(XtW @ X) @ XtW @ response
+  except np.linalg.LinAlgError as error:
+    if 'Singular matrix' in str(error):
+      print("Singular matrix detected, returning None")
+      pass
+    else:
+      raise
+    return None
+  return beta
+
+def irls(predictors, response, input_weights=None, tol=1E-6, delta=1E-6):
+  p = len(predictors) # number of predictors
+  n = len(response) # number of observations
+  if input_weights is None:
+    base_weights = np.ones(n)
+
+  # Do an initial fit to find the "naive" betas
+  trial_beta = weighted_fit(predictors=predictors, response=response, weights=base_weights)
+
+  # Iterate until the betas stop changing (within the tolerance)
+  iterations = 1
+  while True:
+    # Build the model
+    model = np.ones(n)*trial_beta[0] # intercept term
+    for i in range(p):
+      model += trial_beta[i+1]*predictors[i]
+    
+    # Calculate the residuals and use these to update the additional weights,
+    # replacing anything smaller than delta with delta to avoid /0 errors
+    residuals = np.abs(model - response)
+    residuals[residuals&lt;delta]=delta
+    trial_weights = 1.0 / residuals # Should converge to MAE
+    model_weights = base_weights * trial_weights
+    reweighted_beta = weighted_fit(predictors=predictors, response=response, weights=model_weights)
+
+    # If the tolerance is reached, finish and return the betas
+    # (Fractional change in the betas)
+    if ((np.abs(reweighted_beta - trial_beta) / np.abs(trial_beta)) <= tol).all():
+      print(f"IRLS converged after {iterations} iterations")
+      return reweighted_beta
+    # Otherwise update the trial betas and continue
+    trial_beta = reweighted_beta
+    iterations += 1
+  </code></pre>
+
+
+  <a href="#top"><div class="button" style="margin: auto; width: 100px; display: block;" >Back to top</div></a>
+</div>
+
+
+</body>
+</html>
